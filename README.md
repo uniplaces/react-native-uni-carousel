@@ -25,11 +25,17 @@ Simple FlatList card with some helper methods
 #### Props
 
 **spaceBetweenCards** - Margin between cards
+
 **selectedIndex** - Item that is selected on the list
+
 **onChangeSelected** - Callback called when the selectedItem changes
+
 **unselectedCardsWidth** - Space from the next and previous card that is shown
+
 **render(itemToRender, CardListContainerProps)** - Render callback of every single item
+
 **cards** - The array of items to render
+
 **options** - Object of props that get directly passed to `FlatList`
 
 ### PaginatedCardList
@@ -47,6 +53,7 @@ Just a wrapper around `CardList` that handles the pagination and provides some c
 #### Props
 
 **pages** - Object with keys as numbers (`{1: [page 1 array of items], 2: [page 2 array of items]}`
+
 **onChangePage** - Callback that gets called on page change
 
 
