@@ -42,7 +42,7 @@ class PaginatedCardList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const hasNewPage = Object.keys(nextProps.pages).length > Object.keys(this.props.pages.length)
+    const hasNewPage = nextProps.pages && Object.keys(nextProps.pages).length > Object.keys(this.props.pages.length)
     this.setState({
       pages: getPagesWithLoadingCards(nextProps.pages),
     }, () => {
