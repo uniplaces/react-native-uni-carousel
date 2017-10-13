@@ -12,7 +12,7 @@ class CardList extends Component {
 
     this.state = {
       itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
-      currentItem: props.selectedIndex
+      currentItem: props.selectedIndex || 0
     }
 
     this._getItemOffset = this._getItemOffset.bind(this)
@@ -96,10 +96,9 @@ class CardList extends Component {
         <FlatList 
           ref={(list) => this.list = list}
           bounces={true}
-          centerContent={true}
           horizontal={true}
+          showsHorizontalScrollIndicator={false}
           automaticallyAdjustContentInsets={false}
-          numColumns={1}
           onContentSizeChange={() => false}
           decelerationRate='fast'
           showHorizontalScrollIndicator={false}
