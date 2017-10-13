@@ -74,10 +74,6 @@ class CardList extends Component {
     const offset = nativeEvent.contentOffset.x + unselectedCardsWidth + spaceBetweenCards
     const currentItem = Math.round(offset / this.state.itemSize)
 
-    if (currentItem === this.state.currentItem) {
-      return 
-    }
-
     this.setState({ currentItem }, () =>
       onChangeSelected(currentItem, cards[currentItem])
     )

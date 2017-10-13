@@ -95,7 +95,7 @@ class PaginatedCardList extends Component {
             return
           }
 
-          if (isFirstItem(selectedItem)) {
+          if (isFirstItem(selectedItem) && selectedPage.toString() !== Object.keys(pages)[0]) {
             this._onPreviousPage()
 
             return
