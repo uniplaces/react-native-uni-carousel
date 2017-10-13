@@ -12,7 +12,7 @@ class CardList extends Component {
 
     this.state = {
       itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
-      currentItem: 0
+      currentItem: props.selectedIndex
     }
 
     this._getItemOffset = this._getItemOffset.bind(this)
@@ -25,16 +25,29 @@ class CardList extends Component {
       selectedIndex,
       spaceBetweenCards, 
       unselectedCardsWidth = 0,
-      cards
+      cards,
+      onChangeSelected
     } = this.props
+    const { currentItem } = this.state
 
     this.setState({
-      itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2)
+      itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
+      currentItem: nextProps.selectedIndex
     })
+  }
 
+  componentDidUpdate(prevProps) {
+    const { onChangeSelected, unselectedCardsWidth, spaceBetweenCards, cards } = this.props
+    const { currentItem } = this.state
+
+    if (this.props.selectedIndex === prevProps.selectedIndex) {
+      return 
+    }
+
+    onChangeSelected(currentItem, cards[currentItem])
     this.list.scrollToOffset({ 
-      offset: this._getItemOffset(nextProps.selectedIndex),
-      animated: cards === nextProps.cards
+      offset: this._getItemOffset(currentItem) - spaceBetweenCards - (unselectedCardsWidth / 2),
+      animated: prevProps.cards === cards
     })
   }
 
@@ -46,6 +59,7 @@ class CardList extends Component {
 
   _getItemLayout(data, index) {
     const { itemSize } = this.state
+    const { spaceBetweenCards, unselectedCardsWidth } = this.props
 
     return {
       length: itemSize,
@@ -55,7 +69,7 @@ class CardList extends Component {
   }
 
   _onMomentumScrollEnd({ nativeEvent }) {
-    const { unselectedCardsWidth, spaceBetweenCards, onChangeSelected = () => {} } = this.props
+    const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => {} } = this.props
 
     const offset = nativeEvent.contentOffset.x + unselectedCardsWidth + spaceBetweenCards
     const currentItem = Math.round(offset / this.state.itemSize)
@@ -64,7 +78,9 @@ class CardList extends Component {
       return 
     }
 
-    this.setState({ currentItem }, () => onChangeSelected(currentItem))
+    this.setState({ currentItem }, () =>
+      onChangeSelected(currentItem, cards[currentItem])
+    )
   }
 
   render() {

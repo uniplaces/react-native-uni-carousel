@@ -15,8 +15,8 @@ const loadingItem = { loading: true }
 
 const getPagesWithLoadingCards = (pages) => {
   return Object.keys(pages)
-    .reduce((acc, pageKey) => {
-      if (parseInt(pageKey) === 0) {
+    .reduce((acc, pageKey, index) => {
+      if (index === 0) {
         acc[pageKey] = pages[pageKey].concat(loadingItem)
 
         return acc
@@ -44,7 +44,7 @@ class PaginatedCardList extends Component {
   componentWillReceiveProps(nextProps) {
     const hasNewPage = Object.keys(nextProps.pages).length > Object.keys(this.props.pages).length
     this.setState({
-      pages: getPagesWithLoadingCards(nextProps.pages),
+      pages: getPagesWithLoadingCards(nextProps.pages)
     }, () => {
       if (hasNewPage) {
         this._onNextPage()
@@ -62,7 +62,7 @@ class PaginatedCardList extends Component {
       selectedItem: nextPage ? 1 : (this.state.selectedItem + 1)
     })
 
-    onChangePage(nextPageIndex)
+    onChangePage(nextPageIndex, { needNewPage: !!nextPage })
   }
 
   _onPreviousPage() {
@@ -76,7 +76,7 @@ class PaginatedCardList extends Component {
       selectedItem: prevPage ? prevPage.length - 2 : this.state.selectedItem
     })
 
-    onChangePage(prevPageIndex)
+    onChangePage(prevPageIndex, { needNewPage: !!prevPage })
   }
 
   render() {
@@ -88,8 +88,6 @@ class PaginatedCardList extends Component {
         {...this.props}
         onChangeSelected={(...args) => {
           const selectedItem = parseInt(args[0])
-
-          console.log(selectedItem)
 
           if (isLastItem(selectedItem, pages[selectedPage])) {
             this._onNextPage()
@@ -109,7 +107,6 @@ class PaginatedCardList extends Component {
         }}
         cards={pages[selectedPage.toString()]}
         selectedIndex={selectedItem}
-        onChangePage={onChangePage}
       />
     )
   }
