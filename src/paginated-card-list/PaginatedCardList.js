@@ -17,14 +17,14 @@ const getPagesWithLoadingCards = (pages, hasMorePages = false) => {
   return Object.keys(pages)
     .reduce((acc, pageKey, index) => {
       if (index === 0) {
-        acc[pageKey] = pages[pageKey].concat({ ending: true, ...loadingItem })
+        acc[pageKey] = pages[pageKey].concat(hasMorePages ? [{ ending: true, ...loadingItem }] : [])
 
         return acc
       } 
 
       acc[pageKey] = [{ starting: true, ...loadingItem }]
         .concat(pages[pageKey]
-        .concat({ ending: true, ...loadingItem }))
+        .concat(hasMorePages ? { ending: true, ...loadingItem } : []))
 
       return acc
     }, {})
