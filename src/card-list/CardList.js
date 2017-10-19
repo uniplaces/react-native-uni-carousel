@@ -12,7 +12,8 @@ class CardList extends Component {
 
     this.state = {
       itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
-      currentItem: props.selectedIndex || 0
+      currentItem: props.selectedIndex || 0,
+      animated: false
     }
 
     this._getItemOffset = this._getItemOffset.bind(this)
@@ -28,26 +29,26 @@ class CardList extends Component {
       cards,
       onChangeSelected
     } = this.props
-    const { currentItem } = this.state
 
     this.setState({
       itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
-      currentItem: nextProps.selectedIndex
+      currentItem: nextProps.selectedIndex,
+      animated: cards === nextProps.cards
     })
   }
 
   componentDidUpdate(prevProps) {
     const { onChangeSelected, unselectedCardsWidth, spaceBetweenCards, cards } = this.props
-    const { currentItem } = this.state
+    const { currentItem, animated } = this.state
 
     if (this.props.selectedIndex === prevProps.selectedIndex) {
       return 
     }
 
-    onChangeSelected(currentItem, cards[currentItem])
+    cards ? onChangeSelected(cards[currentItem]) : null
     this.list.scrollToOffset({ 
       offset: this._getItemOffset(currentItem) - spaceBetweenCards - (unselectedCardsWidth / 2),
-      animated: prevProps.cards === cards
+      animated: animated
     })
   }
 
@@ -71,11 +72,15 @@ class CardList extends Component {
   _onMomentumScrollEnd({ nativeEvent }) {
     const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => {} } = this.props
 
+    if (!cards) {
+      return
+    }
+
     const offset = nativeEvent.contentOffset.x + unselectedCardsWidth + spaceBetweenCards
     const currentItem = Math.round(offset / this.state.itemSize)
 
     this.setState({ currentItem }, () =>
-      onChangeSelected(currentItem, cards[currentItem])
+      onChangeSelected(cards[currentItem])
     )
   }
 
@@ -107,7 +112,7 @@ class CardList extends Component {
           contentContainerStyle={style.container}
           snapToAlignment='center'
           scrollEventThrottle={1}
-          initialNumToRender={10}
+          initialNumToRender={20}
           data={cards}
           keyExtractor={(item, index) => `card-list-${index}`}
           getItemLayout={this._getItemLayout}
