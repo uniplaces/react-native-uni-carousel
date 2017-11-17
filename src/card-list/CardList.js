@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, FlatList, Dimensions } from 'react-native'
+import { View, FlatList, Dimensions } from 'react-native'
 
-import style from './CardListStyle'
+import styles from './CardListStyle'
 
 const { height, width } = Dimensions.get('window')
 
@@ -22,9 +22,8 @@ class CardList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { 
-      selectedIndex,
-      spaceBetweenCards, 
+    const {
+      spaceBetweenCards,
       unselectedCardsWidth = 0,
       cards,
       onChangeSelected
@@ -42,10 +41,10 @@ class CardList extends Component {
     const { currentItem, animated } = this.state
 
     if (this.props.selectedIndex === prevProps.selectedIndex) {
-      return 
+      return
     }
 
-    this.list.scrollToOffset({ 
+    this.list.scrollToOffset({
       offset: this._getItemOffset(currentItem) - spaceBetweenCards - (unselectedCardsWidth / 2),
       animated: animated
     })
@@ -69,7 +68,7 @@ class CardList extends Component {
   }
 
   _onMomentumScrollEnd({ nativeEvent }) {
-    const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => {} } = this.props
+    const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => { } } = this.props
 
     if (!cards) {
       return
@@ -85,8 +84,8 @@ class CardList extends Component {
 
   render() {
     const { itemSize } = this.state
-    const { 
-      render = () => {},
+    const {
+      render = () => { },
       style = {},
       selectedIndex,
       spaceBetweenCards,
@@ -102,9 +101,10 @@ class CardList extends Component {
 
     return (
       <View>
-        <FlatList 
-          ref={(list) => this.list = list}
-          bounces={true}
+        <FlatList
+          {...options}
+          ref={ref => { this.list = ref }}
+          bounces={false}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           automaticallyAdjustContentInsets={false}
@@ -112,8 +112,7 @@ class CardList extends Component {
           decelerationRate='fast'
           showHorizontalScrollIndicator={false}
           snapToInterval={itemSize}
-          style={[style.cardList, style]}
-          contentContainerStyle={style.container}
+          style={[styles.cardList, style]}
           snapToAlignment='center'
           scrollEventThrottle={1}
           removeClippedSubviews={false}
@@ -124,9 +123,9 @@ class CardList extends Component {
           initialScrollIndex={selectedIndex}
           onMomentumScrollEnd={this._onMomentumScrollEnd}
           contentInset={{ left: unselectedCardsWidth, right: unselectedCardsWidth }}
-          renderItem={(...args) => 
+          renderItem={(...args) =>
             render(
-              ...args, 
+              ...args,
               dimensions
             )
           }
