@@ -42,12 +42,17 @@ class PaginatedCardList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { currentPage, hasMorePages, getSelectedIndex } = nextProps
+    const { currentPage, hasMorePages, getSelectedIndex, onChangeSelected } = nextProps
     const { selectedPage } = this.state
 
     const pages = this.props.pages === nextProps.pages ? this.state.pages : getPagesWithLoadingCards(nextProps.pages, hasMorePages)
     const hasPageChanged = currentPage !== selectedPage
-    const nextPageIndex = () => currentPage > selectedPage ? 1 : pages[currentPage].length - 2
+    const nextPageIndex = () => {
+      const itemIndex = currentPage > selectedPage ? 1 : pages[currentPage].length - 2
+      onChangeSelected && onChangeSelected(pages[currentPage][itemIndex], itemIndex)
+
+      return itemIndex
+    }
 
     this.setState({
       selectedPage: currentPage,
