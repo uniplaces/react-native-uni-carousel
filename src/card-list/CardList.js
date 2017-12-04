@@ -25,29 +25,34 @@ class CardList extends Component {
     const {
       spaceBetweenCards,
       unselectedCardsWidth = 0,
-      cards,
-      onChangeSelected
+      cards
     } = this.props
 
     this.setState({
       itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
-      currentItem: nextProps.selectedIndex,
       animated: cards === nextProps.cards
     })
   }
 
   componentDidUpdate(prevProps) {
-    const { onChangeSelected, unselectedCardsWidth, spaceBetweenCards, cards } = this.props
     const { currentItem, animated } = this.state
 
-    if (this.props.selectedIndex === prevProps.selectedIndex) {
+    if (this.props.selectedIndex === prevProps.selectedIndex || this.props.selectedIndex === currentItem) {
       return
     }
 
+    this._scrollToIndex({ index: this.props.selectedIndex, animated: animated })
+  }
+
+  _scrollToIndex({ index, animated }) {
+    const { unselectedCardsWidth, spaceBetweenCards } = this.props
+
     this.list.scrollToOffset({
-      offset: this._getItemOffset(currentItem) - spaceBetweenCards - (unselectedCardsWidth / 2),
+      offset: this._getItemOffset(index) - spaceBetweenCards - (unselectedCardsWidth / 2),
       animated: animated
     })
+
+    this.setState({ currentItem: index })
   }
 
   _getItemOffset(index) {
@@ -58,7 +63,6 @@ class CardList extends Component {
 
   _getItemLayout(data, index) {
     const { itemSize } = this.state
-    const { spaceBetweenCards, unselectedCardsWidth } = this.props
 
     return {
       length: itemSize,
@@ -104,7 +108,8 @@ class CardList extends Component {
         <FlatList
           {...options}
           ref={ref => { this.list = ref }}
-          bounces={false}
+          extraData={this.state}
+          bounces={true}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           automaticallyAdjustContentInsets={false}
@@ -119,7 +124,6 @@ class CardList extends Component {
           initialNumToRender={10}
           data={cards}
           keyExtractor={(item, index) => `card-list-${index}-${item.id}`}
-          getItemLayout={this._getItemLayout}
           initialScrollIndex={selectedIndex}
           onMomentumScrollEnd={this._onMomentumScrollEnd}
           contentInset={{ left: unselectedCardsWidth, right: unselectedCardsWidth }}
