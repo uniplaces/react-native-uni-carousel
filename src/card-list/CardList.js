@@ -72,7 +72,7 @@ class CardList extends Component {
   }
 
   _onMomentumScrollEnd({ nativeEvent }) {
-    const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => { } } = this.props
+    const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => {} } = this.props
 
     if (!cards) {
       return

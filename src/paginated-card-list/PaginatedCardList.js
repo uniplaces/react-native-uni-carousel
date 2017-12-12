@@ -16,11 +16,12 @@ const getPagesWithLoadingCards = (pages, hasMorePages = false) => {
 
       acc[pageKey] = [{ starting: true, ...loadingItem }]
         .concat(pages[pageKey]
-          .concat(hasMorePages ? { ending: true, ...loadingItem } : []))
+        .concat(hasMorePages ? { ending: true, ...loadingItem } : []))
 
       return acc
     }, {})
 }
+
 
 class PaginatedCardList extends Component {
   constructor(props) {
