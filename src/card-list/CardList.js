@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, FlatList, Dimensions } from 'react-native'
+import { View, FlatList, Dimensions } from 'react-native'
 
-import style from './CardListStyle'
+import styles from './CardListStyle'
 
 const { height, width } = Dimensions.get('window')
 
@@ -22,33 +22,37 @@ class CardList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { 
-      selectedIndex,
-      spaceBetweenCards, 
+    const {
+      spaceBetweenCards,
       unselectedCardsWidth = 0,
-      cards,
-      onChangeSelected
+      cards
     } = this.props
 
     this.setState({
       itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
-      currentItem: nextProps.selectedIndex,
       animated: cards === nextProps.cards
     })
   }
 
   componentDidUpdate(prevProps) {
-    const { onChangeSelected, unselectedCardsWidth, spaceBetweenCards, cards } = this.props
     const { currentItem, animated } = this.state
 
-    if (this.props.selectedIndex === prevProps.selectedIndex) {
-      return 
+    if (this.props.selectedIndex === prevProps.selectedIndex || this.props.selectedIndex === currentItem) {
+      return
     }
 
-    this.list.scrollToOffset({ 
-      offset: this._getItemOffset(currentItem) - spaceBetweenCards - (unselectedCardsWidth / 2),
+    this._scrollToIndex({ index: this.props.selectedIndex, animated: animated })
+  }
+
+  _scrollToIndex({ index, animated }) {
+    const { unselectedCardsWidth, spaceBetweenCards } = this.props
+
+    this.list.scrollToOffset({
+      offset: this._getItemOffset(index) - spaceBetweenCards - (unselectedCardsWidth / 2),
       animated: animated
     })
+
+    this.setState({ currentItem: index })
   }
 
   _getItemOffset(index) {
@@ -59,7 +63,6 @@ class CardList extends Component {
 
   _getItemLayout(data, index) {
     const { itemSize } = this.state
-    const { spaceBetweenCards, unselectedCardsWidth } = this.props
 
     return {
       length: itemSize,
@@ -85,8 +88,8 @@ class CardList extends Component {
 
   render() {
     const { itemSize } = this.state
-    const { 
-      render = () => {},
+    const {
+      render = () => { },
       style = {},
       selectedIndex,
       spaceBetweenCards,
@@ -102,8 +105,10 @@ class CardList extends Component {
 
     return (
       <View>
-        <FlatList 
-          ref={(list) => this.list = list}
+        <FlatList
+          {...options}
+          ref={ref => { this.list = ref }}
+          extraData={this.state}
           bounces={true}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
@@ -112,21 +117,19 @@ class CardList extends Component {
           decelerationRate='fast'
           showHorizontalScrollIndicator={false}
           snapToInterval={itemSize}
-          style={[style.cardList, style]}
-          contentContainerStyle={style.container}
+          style={[styles.cardList, style]}
           snapToAlignment='center'
           scrollEventThrottle={1}
           removeClippedSubviews={false}
           initialNumToRender={10}
           data={cards}
           keyExtractor={(item, index) => `card-list-${index}-${item.id}`}
-          getItemLayout={this._getItemLayout}
           initialScrollIndex={selectedIndex}
           onMomentumScrollEnd={this._onMomentumScrollEnd}
           contentInset={{ left: unselectedCardsWidth, right: unselectedCardsWidth }}
-          renderItem={(...args) => 
+          renderItem={(...args) =>
             render(
-              ...args, 
+              ...args,
               dimensions
             )
           }

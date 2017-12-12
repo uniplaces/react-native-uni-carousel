@@ -2,14 +2,6 @@ import React, { Component } from 'react'
 
 import CardList from '../../src'
 
-const isFirstItem = (itemNumber) => {
-  return itemNumber === 0
-}
-
-const isLastItem = (itemNumber, cards) => {
-  return itemNumber === cards.length - 1
-}
-
 // SHOULD BE POSSIBLE TO DECIDE LOADING CARD FROM OUTSIDE
 const loadingItem = { loading: true }
 
@@ -20,7 +12,7 @@ const getPagesWithLoadingCards = (pages, hasMorePages = false) => {
         acc[pageKey] = pages[pageKey].concat(hasMorePages ? [{ ending: true, ...loadingItem }] : [])
 
         return acc
-      } 
+      }
 
       acc[pageKey] = [{ starting: true, ...loadingItem }]
         .concat(pages[pageKey]
@@ -30,14 +22,19 @@ const getPagesWithLoadingCards = (pages, hasMorePages = false) => {
     }, {})
 }
 
+
 class PaginatedCardList extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      selectedPage: 0,
-      selectedItem: 0,
-      pages: getPagesWithLoadingCards(props.pages, props.hasMorePages),
+    const selectedPage = props.currentPage || 0
+    const pages = getPagesWithLoadingCards(props.pages, props.hasMorePages)
+    const selectedItem = this._getSelectedItem(pages, selectedPage, this.props.getSelectedIndex)
+
+    this.state = {
+      selectedItem: selectedItem !== -1 ? selectedItem : 0,
+      selectedPage,
+      pages
     }
 
     this._onNextPage = this._onNextPage.bind(this)
@@ -45,25 +42,29 @@ class PaginatedCardList extends Component {
     this._getSelectedItem = this._getSelectedItem.bind(this)
   }
 
-  componentWillReceiveProps({ currentPage, pages, hasMorePages }) {
-    const { selectedItem, selectedPage } = this.state
-    
-    const newPages = getPagesWithLoadingCards(pages, hasMorePages)
+  componentWillReceiveProps(nextProps) {
+    const { currentPage, hasMorePages, getSelectedIndex, onChangeSelected } = nextProps
+    const { selectedPage } = this.state
+
+    const pages = this.props.pages === nextProps.pages ? this.state.pages : getPagesWithLoadingCards(nextProps.pages, hasMorePages)
     const hasPageChanged = currentPage !== selectedPage
-    const nextPageIndex = () => currentPage > selectedPage ? 1 : newPages[currentPage].length - 2
+    const nextPageIndex = () => {
+      const itemIndex = currentPage > selectedPage ? 1 : pages[currentPage].length - 2
+      onChangeSelected && onChangeSelected(pages[currentPage][itemIndex], itemIndex)
+
+      return itemIndex
+    }
 
     this.setState({
       selectedPage: currentPage,
-      pages: newPages,
-      selectedItem: hasPageChanged 
+      pages: pages,
+      selectedItem: hasPageChanged
         ? nextPageIndex()
-        : this._getSelectedItem(newPages, selectedPage)
+        : this._getSelectedItem(pages, selectedPage, getSelectedIndex)
     })
   }
 
-  _getSelectedItem(pages, selectedPage) {
-    const { getSelectedIndex = () => {} } = this.props
-
+  _getSelectedItem(pages, selectedPage, getSelectedIndex = () => { }) {
     if (!pages[selectedPage]) {
       return
     }
@@ -72,15 +73,15 @@ class PaginatedCardList extends Component {
   }
 
   _onNextPage() {
-    const { onChangePage = () => {} } = this.props
+    const { onChangePage = () => { } } = this.props
 
-    const nextPageIndex = this.state.selectedPage + 1 
+    const nextPageIndex = this.state.selectedPage + 1
 
     onChangePage(nextPageIndex)
   }
 
   _onPreviousPage() {
-    const { onChangePage = () => {} } = this.props
+    const { onChangePage = () => { } } = this.props
 
     const prevPageIndex = this.state.selectedPage - 1
 
@@ -88,9 +89,9 @@ class PaginatedCardList extends Component {
   }
 
   render() {
-    const { onChangeSelected = () => {}, onChangePage = () => {} } = this.props
+    const { onChangeSelected = () => { } } = this.props
     const { pages, selectedPage, selectedItem } = this.state
-    
+
     return (
       <CardList
         {...this.props}
