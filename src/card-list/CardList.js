@@ -25,12 +25,13 @@ class CardList extends Component {
     const {
       spaceBetweenCards,
       unselectedCardsWidth = 0,
-      cards
+      cards,
+      visible = true
     } = this.props
 
     this.setState({
       itemSize: width - (spaceBetweenCards + unselectedCardsWidth * 2),
-      animated: cards === nextProps.cards
+      animated: (cards === nextProps.cards) && visible
     })
   }
 
@@ -72,7 +73,7 @@ class CardList extends Component {
   }
 
   _onMomentumScrollEnd({ nativeEvent }) {
-    const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => {} } = this.props
+    const { unselectedCardsWidth, spaceBetweenCards, cards, onChangeSelected = () => { } } = this.props
 
     if (!cards) {
       return
@@ -122,6 +123,7 @@ class CardList extends Component {
           scrollEventThrottle={1}
           removeClippedSubviews={false}
           initialNumToRender={10}
+          getItemLayout={this._getItemLayout}
           data={cards}
           keyExtractor={(item, index) => `card-list-${index}-${item.id}`}
           initialScrollIndex={selectedIndex}
