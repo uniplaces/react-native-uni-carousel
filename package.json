@@ -1,6 +1,6 @@
 {
     "name": "react-native-uni-carousel",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "keywords": [
         "react-native",
         "modal",
@@ -11,7 +11,8 @@
     ],
     "homepage": "https://github.com/uniplaces/react-native-uni-carousel",
     "author": "Uniplaces",
-    "contributors": [{
+    "contributors": [
+        {
             "name": "Alexandre Santos",
             "url": "https://github.com/asantos00"
         },
