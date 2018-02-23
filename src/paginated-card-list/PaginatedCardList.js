@@ -16,12 +16,11 @@ const getPagesWithLoadingCards = (pages, hasMorePages = false) => {
 
       acc[pageKey] = [{ starting: true, ...loadingItem }]
         .concat(pages[pageKey]
-        .concat(hasMorePages ? { ending: true, ...loadingItem } : []))
+          .concat(hasMorePages ? { ending: true, ...loadingItem } : []))
 
       return acc
     }, {})
 }
-
 
 class PaginatedCardList extends Component {
   constructor(props) {
@@ -32,7 +31,7 @@ class PaginatedCardList extends Component {
     const selectedItem = this._getSelectedItem(pages, selectedPage, this.props.getSelectedIndex)
 
     this.state = {
-      selectedItem: selectedItem !== -1 ? selectedItem : 0,
+      selectedItem: selectedItem !== -1 ? selectedItem : 1,
       selectedPage,
       pages
     }
@@ -69,7 +68,10 @@ class PaginatedCardList extends Component {
       return
     }
 
-    return pages[selectedPage].findIndex(getSelectedIndex)
+    const a = pages[selectedPage].findIndex(getSelectedIndex)
+    console.log(a)
+
+    return a !== -1 || selectedPage > 1 ? 1 : 0
   }
 
   _onNextPage() {
