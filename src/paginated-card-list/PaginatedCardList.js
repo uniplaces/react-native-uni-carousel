@@ -68,10 +68,9 @@ class PaginatedCardList extends Component {
       return
     }
 
-    const a = pages[selectedPage].findIndex(getSelectedIndex)
-    console.log(a)
+    const selectedIndex = pages[selectedPage].findIndex(getSelectedIndex)
 
-    return a !== -1 || selectedPage > 1 ? 1 : 0
+    return selectedIndex !== -1 ? selectedIndex : (selectedPage > 1 ? 1 : 0)
   }
 
   _onNextPage() {
